@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Check a link{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Is this link safe to open?</h1>
+  <p class="lead">Paste a link you got by email, SMS or WhatsApp. PhishGuard checks it in four ways and tells you the risk, with reasons.</p>
+
+  <form method="post" action="{{ url_for('scan.scan') }}" class="scan-form" id="scan-form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="url" class="sr-only">Suspicious link</label>
+    <input type="text" id="url" name="url" value="{{ url }}" placeholder="https://example.com/login"
+           autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="2048" required autofocus>
+    <button type="submit" class="btn btn-lg" id="scan-btn">
+      <span class="btn-label">Scan link</span>
+      <span class="spinner" aria-hidden="true"></span>
+    </button>
+  </form>
+  <p class="form-hint" id="url-hint">PhishGuard never opens the page in your browser. It only reads public information about it.</p>
+
+  <div class="scan-progress" id="scan-progress" hidden>
+    <ol>
+      <li>Cleaning the URL</li>
+      <li>Checking the URL structure</li>
+      <li>Asking the machine learning model</li>
+      <li>Searching phishing lists</li>
+      <li>Looking up the domain</li>
+    </ol>
+  </div>
+</section>
+
+<section class="checks-grid">
+  <div class="check-card">
+    <div class="check-icon">⌁</div>
+    <h3>URL checks</h3>
+    <p>Looks for tricks in the link itself: IP addresses, fake brand names, look-alike letters, hidden redirects.</p>
+  </div>
+  <div class="check-card">
+    <div class="check-icon">◎</div>
+    <h3>Machine learning</h3>
+    <p>A model trained on thousands of real phishing and normal links gives its prediction.</p>
+  </div>
+  <div class="check-card">
+    <div class="check-icon">⚑</div>
+    <h3>Threat lists</h3>
+    <p>Compares the link with live lists of known phishing websites and our own confirmed reports.</p>
+  </div>
+  <div class="check-card">
+    <div class="check-icon">◷</div>
+    <h3>Domain details</h3>
+    <p>Checks how old the domain is, its DNS records and its security certificate.</p>
+  </div>
+</section>
+
+{% if recent %}
+<section class="card">
+  <div class="card-head">
+    <h2>Your recent scans</h2>
+    <a href="{{ url_for('scan.history') }}">View all</a>
+  </div>
+  <table class="table">
+    <tbody>
+    {% for r in recent %}
+      <tr>
+        <td class="url-cell"><a href="{{ url_for('scan.result', scan_id=r.id) }}">{{ r.normalized_url }}</a></td>
+        <td><span class="badge badge-{{ r.risk_level|lower|replace(' ', '-') }}">{{ r.risk_level }}</span></td>
+        <td class="muted nowrap">{{ r.created_at.strftime('%d %b, %H:%M') }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% elif not current_user.id %}
+<p class="center muted"><a href="{{ url_for('auth.register') }}">Create a free account</a> to keep a history of your scans.</p>
+{% endif %}
+{% endblock %}

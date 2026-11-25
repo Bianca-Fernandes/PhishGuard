@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Users{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Role</th><th>Scans</th><th>Joined</th><th>Last login</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for u in rows %}
+    <tr>
+      <td>{{ u.id }}</td>
+      <td>{{ u.full_name }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.role|capitalize }}</td>
+      <td>{{ u.scans }}</td>
+      <td class="muted nowrap">{{ u.created_at.strftime('%d %b %Y') }}</td>
+      <td class="muted nowrap">{{ u.last_login.strftime('%d %b %Y, %H:%M') if u.last_login else '-' }}</td>
+      <td><span class="badge badge-{{ 'very-low' if u.is_active else 'critical' }}">{{ 'Active' if u.is_active else 'Disabled' }}</span></td>
+      <td>
+        {% if u.id != current_user.id %}
+        <form method="post" action="{{ url_for('admin.toggle_user', user_id=u.id) }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="link-btn {{ 'danger' if u.is_active }}" type="submit">{{ 'Disable' if u.is_active else 'Enable' }}</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

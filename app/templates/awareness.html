@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Phishing awareness{% endblock %}
+{% block content %}
+<div class="narrow prose">
+  <h1>What is phishing?</h1>
+  <p class="lead">Phishing is a trick where someone pretends to be a bank, a company or a person you trust, so that you give them your password, OTP, card details or money.</p>
+
+  <h2>Where phishing comes from</h2>
+  <div class="tile-grid">
+    <div class="tile"><h3>Email</h3><p>"Your account is suspended. Click here to verify." Often with a logo copied from the real company.</p></div>
+    <div class="tile"><h3>SMS (smishing)</h3><p>"Dear customer, your KYC is pending. Update now or your account will be blocked today."</p></div>
+    <div class="tile"><h3>WhatsApp</h3><p>Fake job offers, lottery prizes, "electricity bill unpaid" messages, or a friend's hacked account asking for money.</p></div>
+    <div class="tile"><h3>QR codes</h3><p>A QR code to "receive" money. Scanning a QR code is only ever needed to <em>pay</em>, never to receive.</p></div>
+  </div>
+
+  <h2>How to spot a fake link</h2>
+  <ol class="steps">
+    <li><strong>Read the real domain.</strong> In <code>paypal.com.secure-login.tk/</code> the real website is <code>secure-login.tk</code>, not PayPal. The real domain is the part just before the first single <code>/</code>.</li>
+    <li><strong>Look for spelling tricks.</strong> <code>amaz0n.in</code>, <code>hdfcbank-update.com</code>, <code>rnicrosoft.com</code> (r + n looks like m).</li>
+    <li><strong>Be careful with short links</strong> like bit.ly or tinyurl. They hide where they really go.</li>
+    <li><strong>The padlock is not enough.</strong> Phishing sites can also have HTTPS. It only means the connection is encrypted, not that the site is honest.</li>
+    <li><strong>Notice the pressure.</strong> "Within 24 hours", "last warning", "your account will be blocked" are made to stop you from thinking.</li>
+  </ol>
+
+  <h2>Golden rules</h2>
+  <ul class="checklist">
+    <li>No bank, government office or company will ever ask for your OTP, PIN, CVV or password.</li>
+    <li>Open important websites by typing the address yourself or using the official app.</li>
+    <li>Turn on two-factor authentication on email, banking and social media.</li>
+    <li>If a friend asks for money on chat, call them first to confirm.</li>
+    <li>Use different passwords for different sites, or a password manager.</li>
+  </ul>
+
+  <h2>If you already clicked</h2>
+  <ul class="checklist warn">
+    <li>Close the page. Do not type anything more.</li>
+    <li>Change the password of that account, and any account using the same password.</li>
+    <li>If you shared card or bank details, call your bank immediately to block them.</li>
+    <li>In India, report at <b>cybercrime.gov.in</b> or call <b>1930</b> as soon as possible. Quick reporting can help stop the money transfer.</li>
+    <li><a href="{{ url_for('scan.report') }}">Report the link to PhishGuard</a> so others are warned.</li>
+  </ul>
+</div>
+{% endblock %}

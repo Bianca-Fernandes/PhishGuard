@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+<div class="card">
+  {% if rows %}
+  <table class="table">
+    <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Detail</th><th>IP</th></tr></thead>
+    <tbody>
+    {% for a in rows %}
+    <tr>
+      <td class="muted nowrap">{{ a.created_at.strftime('%d %b %Y, %H:%M:%S') }}</td>
+      <td>{{ a.email or '-' }}</td>
+      <td><code>{{ a.action }}</code></td>
+      <td class="url-cell">{{ a.detail or '' }}</td>
+      <td class="muted">{{ a.ip_address or '' }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="empty">No entries yet.</p>{% endif %}
+</div>
+{% endblock %}

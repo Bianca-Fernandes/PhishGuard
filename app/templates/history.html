@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Scan history{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Scan history</h1>
+  <span class="muted">{{ total }} scan{{ 's' if total != 1 }}</span>
+</div>
+
+<form method="get" class="filters">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search URL">
+  <select name="level">
+    <option value="">All risk levels</option>
+    {% for lv in levels %}<option value="{{ lv }}" {{ 'selected' if lv == level }}>{{ lv }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-sm" type="submit">Filter</button>
+  {% if q or level %}<a href="{{ url_for('scan.history') }}" class="btn btn-sm btn-ghost">Clear</a>{% endif %}
+</form>
+
+<div class="card">
+{% if rows %}
+  <table class="table">
+    <thead><tr><th>URL</th><th>Risk</th><th>Score</th><th>Model</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      <tr>
+        <td class="url-cell"><a href="{{ url_for('scan.result', scan_id=r.id) }}">{{ r.normalized_url }}</a></td>
+        <td><span class="badge badge-{{ r.risk_level|lower|replace(' ', '-') }}">{{ r.risk_level }}</span></td>
+        <td>{{ r.risk_score }}</td>
+        <td class="muted">{{ r.model_version or '-' }}</td>
+        <td class="muted nowrap">{{ r.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+        <td>
+          <form method="post" action="{{ url_for('scan.delete_scan', scan_id=r.id) }}" class="inline" data-confirm="Remove this scan from your history?">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="link-btn danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if pages > 1 %}
+  <nav class="pager">
+    {% if page > 1 %}<a href="{{ url_for('scan.history', page=page-1, q=q, level=level) }}">← Newer</a>{% endif %}
+    <span>Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}<a href="{{ url_for('scan.history', page=page+1, q=q, level=level) }}">Older →</a>{% endif %}
+  </nav>
+  {% endif %}
+{% else %}
+  <p class="empty">No scans found. <a href="{{ url_for('scan.index') }}">Scan a link</a></p>
+{% endif %}
+</div>
+{% endblock %}

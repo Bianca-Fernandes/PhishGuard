@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Create account{% endblock %}
+{% block content %}
+<div class="auth-box">
+  <h1>Create an account</h1>
+  <form method="post" class="card form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Full name
+      <input type="text" name="full_name" value="{{ form.full_name }}" required maxlength="100" autocomplete="name" autofocus>
+    </label>
+    <label>Email
+      <input type="email" name="email" value="{{ form.email }}" required maxlength="150" autocomplete="email">
+    </label>
+    <label>Password
+      <input type="password" name="password" id="password" required autocomplete="new-password">
+      <span class="pw-meter" id="pw-meter"><span></span><span></span><span></span><span></span></span>
+      <span class="form-hint">At least 8 characters with a capital letter, a small letter and a number.</span>
+    </label>
+    <label>Confirm password
+      <input type="password" name="confirm_password" required autocomplete="new-password">
+    </label>
+    <button class="btn btn-block" type="submit">Create account</button>
+  </form>
+  <p class="center muted">Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a></p>
+</div>
+{% endblock %}

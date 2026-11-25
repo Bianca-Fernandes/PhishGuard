@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Blocklist{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+
+<form method="post" class="filters">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input type="text" name="domain" placeholder="Domain or URL to block" required>
+  <button class="btn btn-sm" type="submit">Add to blocklist</button>
+</form>
+
+<div class="card">
+{% if rows %}
+  <table class="table">
+    <thead><tr><th>Domain</th><th>Source</th><th>Added by</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><code>{{ r.domain }}</code></td>
+      <td>{{ 'Report #' ~ r.report_id if r.report_id else 'Manual' }}</td>
+      <td class="muted">{{ r.added_by_email or '-' }}</td>
+      <td class="muted nowrap">{{ r.added_at.strftime('%d %b %Y') }}</td>
+      <td>
+        <form method="post" action="{{ url_for('admin.blocklist_delete', item_id=r.id) }}" class="inline" data-confirm="Remove {{ r.domain }} from the blocklist?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="link-btn danger" type="submit">Remove</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty">The blocklist is empty. Confirmed reports are added here automatically.</p>
+{% endif %}
+</div>
+{% endblock %}

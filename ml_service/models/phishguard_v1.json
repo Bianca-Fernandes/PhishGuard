@@ -1,0 +1,166 @@
+{
+  "version": "v1",
+  "algorithm": "Random Forest",
+  "trained_at": "2026-11-25T01:12:33",
+  "dataset": "data.csv",
+  "rows": 200000,
+  "train_rows": 160000,
+  "test_rows": 40000,
+  "features": [
+    "url_length",
+    "host_length",
+    "path_length",
+    "query_length",
+    "num_dots",
+    "num_hyphens",
+    "num_underscores",
+    "num_slashes",
+    "num_at",
+    "num_question",
+    "num_equals",
+    "num_ampersand",
+    "num_percent",
+    "num_tilde",
+    "num_digits",
+    "num_params",
+    "digit_ratio",
+    "letter_ratio",
+    "special_ratio",
+    "num_subdomains",
+    "host_has_digits",
+    "host_hyphens",
+    "is_ip",
+    "has_port",
+    "is_punycode",
+    "is_shortener",
+    "suspicious_tld",
+    "suspicious_word_count",
+    "path_depth",
+    "has_double_slash_in_path",
+    "host_entropy",
+    "url_entropy",
+    "longest_token",
+    "has_php_or_html",
+    "tld_length"
+  ],
+  "metrics": {
+    "accuracy": 0.9312,
+    "precision": 0.7422,
+    "recall": 0.8809,
+    "f1": 0.8056,
+    "roc_auc": 0.9722,
+    "confusion_matrix": {
+      "tn": 31546,
+      "fp": 1981,
+      "fn": 771,
+      "tp": 5702
+    },
+    "train_seconds": 3.9
+  },
+  "all_models": {
+    "Logistic Regression": {
+      "accuracy": 0.8222,
+      "precision": 0.4687,
+      "recall": 0.74,
+      "f1": 0.5739,
+      "roc_auc": 0.8712,
+      "confusion_matrix": {
+        "tn": 28097,
+        "fp": 5430,
+        "fn": 1683,
+        "tp": 4790
+      },
+      "train_seconds": 0.5
+    },
+    "Random Forest": {
+      "accuracy": 0.9312,
+      "precision": 0.7422,
+      "recall": 0.8809,
+      "f1": 0.8056,
+      "roc_auc": 0.9722,
+      "confusion_matrix": {
+        "tn": 31546,
+        "fp": 1981,
+        "fn": 771,
+        "tp": 5702
+      },
+      "train_seconds": 3.9
+    },
+    "Gradient Boosting": {
+      "accuracy": 0.9151,
+      "precision": 0.8788,
+      "recall": 0.5512,
+      "f1": 0.6775,
+      "roc_auc": 0.9381,
+      "confusion_matrix": {
+        "tn": 33035,
+        "fp": 492,
+        "fn": 2905,
+        "tp": 3568
+      },
+      "train_seconds": 27.0
+    }
+  },
+  "top_features": [
+    {
+      "feature": "tld_length",
+      "importance": 0.1246
+    },
+    {
+      "feature": "path_length",
+      "importance": 0.074
+    },
+    {
+      "feature": "num_hyphens",
+      "importance": 0.0601
+    },
+    {
+      "feature": "url_entropy",
+      "importance": 0.0521
+    },
+    {
+      "feature": "num_digits",
+      "importance": 0.0505
+    },
+    {
+      "feature": "longest_token",
+      "importance": 0.0498
+    },
+    {
+      "feature": "num_dots",
+      "importance": 0.0474
+    },
+    {
+      "feature": "special_ratio",
+      "importance": 0.046
+    },
+    {
+      "feature": "suspicious_word_count",
+      "importance": 0.0458
+    },
+    {
+      "feature": "letter_ratio",
+      "importance": 0.0456
+    },
+    {
+      "feature": "host_entropy",
+      "importance": 0.0451
+    },
+    {
+      "feature": "digit_ratio",
+      "importance": 0.0445
+    },
+    {
+      "feature": "host_length",
+      "importance": 0.0443
+    },
+    {
+      "feature": "url_length",
+      "importance": 0.0439
+    },
+    {
+      "feature": "num_slashes",
+      "importance": 0.0438
+    }
+  ]
+}

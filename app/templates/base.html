@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}PhishGuard{% endblock %} · PhishGuard</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="{{ url_for('scan.index') }}">
+        <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z" fill="currentColor" opacity=".2"/><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5l-8-3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m8.5 12 2.4 2.4 4.6-4.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        PhishGuard
+      </a>
+      <button class="menu-toggle" type="button" aria-label="Open menu" data-toggle="nav">☰</button>
+      <nav class="nav" id="nav">
+        <a href="{{ url_for('scan.index') }}" class="{{ 'active' if request.endpoint == 'scan.index' }}">Scan</a>
+        {% if current_user.id %}
+        <a href="{{ url_for('scan.history') }}" class="{{ 'active' if request.endpoint == 'scan.history' }}">History</a>
+        {% endif %}
+        <a href="{{ url_for('pages.awareness') }}" class="{{ 'active' if request.endpoint == 'pages.awareness' }}">Awareness</a>
+        <a href="{{ url_for('scan.report') }}" class="{{ 'active' if request.endpoint == 'scan.report' }}">Report Phishing</a>
+        {% if current_user.role == 'admin' %}
+        <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint and request.endpoint.startswith('admin.') }}">Admin</a>
+        {% endif %}
+        <span class="nav-sep"></span>
+        {% if current_user.id %}
+          <a href="{{ url_for('auth.profile') }}" class="nav-user">{{ current_user.name.split()[0] }}</a>
+          <form method="post" action="{{ url_for('auth.logout') }}" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="link-btn" type="submit">Log out</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}">Log in</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-sm">Sign up</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flashes">
+        {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}" role="alert">
+          <span>{{ msg }}</span>
+          <button type="button" class="flash-close" aria-label="Dismiss">×</button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>PhishGuard · Phishing Attacks Detection System</span>
+      <span class="muted">Results show a risk level, never a 100% safety guarantee.</span>
+      <a href="{{ url_for('pages.about') }}">About</a>
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

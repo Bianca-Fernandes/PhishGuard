@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Scan result{% endblock %}
+{% block content %}
+<a href="{{ url_for('scan.index') }}" class="back-link">← Scan another link</a>
+
+<section class="result-hero result-{{ level_class }}">
+  <div class="gauge">
+    <svg viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="52" class="gauge-bg"/>
+      <circle cx="60" cy="60" r="52" class="gauge-fg"
+              stroke-dasharray="{{ (scan.risk_score * 3.267)|round(1) }} 326.7" transform="rotate(-90 60 60)"/>
+    </svg>
+    <div class="gauge-text"><strong>{{ scan.risk_score }}</strong><span>/ 100</span></div>
+  </div>
+  <div class="result-main">
+    <div class="eyebrow">Risk level</div>
+    <h1>{{ scan.risk_level }} risk</h1>
+    <p class="result-summary">{{ scan.summary }}</p>
+    <div class="result-url">
+      <code>{{ scan.normalized_url }}</code>
+      <button type="button" class="link-btn" data-copy="{{ scan.normalized_url }}">Copy</button>
+    </div>
+    {% if scan.original_url.strip() != scan.normalized_url %}
+    <div class="muted small">You entered: <code>{{ scan.original_url }}</code></div>
+    {% endif %}
+  </div>
+</section>
+
+<div class="level-scale" aria-hidden="true">
+  {% for lv in ['Very Low', 'Low', 'Medium', 'High', 'Critical'] %}
+  <span class="scale-step scale-{{ lv|lower|replace(' ', '-') }} {{ 'current' if lv == scan.risk_level }}">{{ lv }}</span>
+  {% endfor %}
+</div>
+
+<div class="result-grid">
+  <section class="card">
+    <h2>Why this result?</h2>
+    {% if reasons %}
+    <ul class="reason-list">
+      {% for r in reasons %}
+      <li class="reason reason-{{ r.status }}">
+        <strong>{{ r.name }}</strong>
+        <span>{{ r.detail }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>None of the checks found a clear warning sign.</p>
+    {% endif %}
+
+    <div class="score-breakdown">
+      <div><span class="muted">URL checks</span><strong>{{ scan.url_score }}/100</strong></div>
+      <div><span class="muted">ML model</span><strong>{{ scan.ml_probability|pct }}</strong></div>
+      <div><span class="muted">Domain checks</span><strong>{{ scan.domain_score if scan.domain_score is not none else '-' }}{% if scan.domain_score is not none %}/100{% endif %}</strong></div>
+      <div><span class="muted">Threat lists</span><strong>{{ 'Listed' if scan.threat_hit else 'Not listed' }}</strong></div>
+    </div>
+  </section>
+
+  <section class="card tips-card">
+    <h2>What should you do?</h2>
+    <ul class="tips">
+      {% for t in tips %}<li>{{ t }}</li>{% endfor %}
+    </ul>
+    <div class="actions">
+      <a class="btn btn-outline" href="{{ url_for('scan.report', url=scan.normalized_url) }}">Report this link</a>
+      <a class="btn btn-ghost" href="{{ url_for('pages.awareness') }}">Learn about phishing</a>
+    </div>
+  </section>
+</div>
+
+<section class="card">
+  <h2>All checks</h2>
+  <div class="signal-groups">
+    {% for key, title in titles.items() %}
+    <div class="signal-group">
+      <h3>{{ title }}</h3>
+      {% if groups[key] %}
+      <ul class="signal-list">
+        {% for s in groups[key] %}
+        <li class="signal signal-{{ s.status }}">
+          <span class="dot" title="{{ s.status }}"></span>
+          <div>
+            <div class="signal-name">{{ s.name }}{% if s.points %} <span class="pts">+{{ s.points }}</span>{% endif %}</div>
+            <div class="signal-detail">{{ s.detail }}</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="muted small">This check was not run.</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  <p class="muted small meta">
+    Scan #{{ scan.id }} · {{ scan.created_at.strftime('%d %b %Y, %H:%M') }} ·
+    model {{ scan.model_version or 'not available' }} · took {{ (scan.duration_ms / 1000)|round(1) }} s
+  </p>
+</section>
+{% endblock %}

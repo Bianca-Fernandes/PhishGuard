@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Phishing reports{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+
+<div class="tabs">
+  {% for s in ['pending', 'confirmed', 'rejected', 'all'] %}
+  <a href="{{ url_for('admin.reports', status=s) }}" class="{{ 'active' if s == status }}">{{ s|capitalize }}</a>
+  {% endfor %}
+</div>
+
+<div class="card">
+{% if rows %}
+  <table class="table">
+    <thead><tr><th>#</th><th>Reported link</th><th>From</th><th>Reporter</th><th>Date</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td class="url-cell">
+        <code>{{ r.url }}</code>
+        {% if r.description %}<div class="muted small">“{{ r.description }}”</div>{% endif %}
+      </td>
+      <td>{{ r.source_channel|replace('_', ' ')|capitalize }}</td>
+      <td class="muted">{{ r.reporter or 'guest' }}</td>
+      <td class="muted nowrap">{{ r.created_at.strftime('%d %b %Y') }}</td>
+      <td>
+        <span class="badge badge-{{ {'pending': 'medium', 'confirmed': 'critical', 'rejected': 'very-low'}[r.status] }}">{{ r.status }}</span>
+        {% if r.reviewer %}<div class="muted small">by {{ r.reviewer }}</div>{% endif %}
+      </td>
+      <td class="nowrap">
+        <a class="link-btn" href="{{ url_for('scan.index', url=r.url) }}">Scan</a>
+        {% if r.status == 'pending' %}
+        <form method="post" action="{{ url_for('admin.review_report', report_id=r.id, action='confirm', back=status) }}" class="inline" data-confirm="Confirm as phishing and block {{ r.domain }}?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-danger" type="submit">Confirm</button>
+        </form>
+        <form method="post" action="{{ url_for('admin.review_report', report_id=r.id, action='reject', back=status) }}" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="btn btn-sm btn-ghost" type="submit">Reject</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty">No {{ status if status != 'all' }} reports.</p>
+{% endif %}
+</div>
+{% endblock %}

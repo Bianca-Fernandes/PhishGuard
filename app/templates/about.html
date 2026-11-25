@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}About{% endblock %}
+{% block content %}
+<div class="narrow prose">
+  <h1>About PhishGuard</h1>
+  <p class="lead">PhishGuard (Phishing Attacks Detection System) is a BCA Vth semester major project at the School of Computer Applications, JECRC University, Jaipur.</p>
+
+  <h2>How a scan works</h2>
+  <ol class="steps">
+    <li>The URL is cleaned and only http / https links are accepted.</li>
+    <li>Signals are collected from four checks: URL structure, a machine learning model, threat lists and domain details (RDAP, DNS, TLS).</li>
+    <li>The risk engine combines the signals into a score from 0 to 100 and one of five risk levels.</li>
+    <li>The result, the reasons and safety tips are shown and the scan is saved in history.</li>
+  </ol>
+
+  <h2>Risk levels</h2>
+  <table class="table">
+    <tbody>
+      <tr><td><span class="badge badge-very-low">Very Low</span></td><td>0 – 19</td></tr>
+      <tr><td><span class="badge badge-low">Low</span></td><td>20 – 39</td></tr>
+      <tr><td><span class="badge badge-medium">Medium</span></td><td>40 – 59</td></tr>
+      <tr><td><span class="badge badge-high">High</span></td><td>60 – 79</td></tr>
+      <tr><td><span class="badge badge-critical">Critical</span></td><td>80 – 100</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Limitations</h2>
+  <p>No phishing detector is perfect. A real website can sometimes look risky, and a brand-new phishing site can be missed. Outside services may be unavailable at times, and then PhishGuard uses the information it has. That is why the result is always shown as a risk, never as a guarantee.</p>
+
+  <h2>Technology</h2>
+  <p>HTML, CSS and JavaScript · Python and Flask · MySQL · scikit-learn · RDAP, DNS and TLS lookups · OpenPhish and Google Safe Browsing.</p>
+</div>
+{% endblock %}

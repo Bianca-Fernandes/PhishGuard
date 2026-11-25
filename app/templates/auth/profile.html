@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}My profile{% endblock %}
+{% block content %}
+<div class="narrow">
+  <h1>My profile</h1>
+  <div class="stat-row">
+    <div class="stat"><span>Total scans</span><strong>{{ stats.total or 0 }}</strong></div>
+    <div class="stat"><span>High / Critical found</span><strong>{{ stats.risky or 0 }}</strong></div>
+    <div class="stat"><span>Reports sent</span><strong>{{ report_count }}</strong></div>
+  </div>
+
+  <div class="card">
+    <dl class="details">
+      <dt>Name</dt><dd>{{ user.full_name }}</dd>
+      <dt>Email</dt><dd>{{ user.email }}</dd>
+      <dt>Role</dt><dd>{{ user.role|capitalize }}</dd>
+      <dt>Member since</dt><dd>{{ user.created_at.strftime('%d %b %Y') }}</dd>
+      <dt>Last login</dt><dd>{{ user.last_login.strftime('%d %b %Y, %H:%M') if user.last_login else '-' }}</dd>
+    </dl>
+  </div>
+
+  <h2>Change password</h2>
+  <form method="post" class="card form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Current password <input type="password" name="current_password" required autocomplete="current-password"></label>
+    <label>New password <input type="password" name="new_password" required autocomplete="new-password"></label>
+    <label>Confirm new password <input type="password" name="confirm_password" required autocomplete="new-password"></label>
+    <button class="btn" type="submit">Update password</button>
+  </form>
+</div>
+{% endblock %}

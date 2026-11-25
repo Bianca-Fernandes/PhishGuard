@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+
+<div class="stat-row">
+  <div class="stat"><span>Total scans</span><strong>{{ totals.scans }}</strong></div>
+  <div class="stat"><span>Scans in last 24h</span><strong>{{ totals.today }}</strong></div>
+  <div class="stat"><span>Users</span><strong>{{ totals.users }}</strong></div>
+  <a class="stat stat-link {{ 'stat-alert' if totals.pending }}" href="{{ url_for('admin.reports') }}"><span>Pending reports</span><strong>{{ totals.pending }}</strong></a>
+  <div class="stat"><span>Blocked domains</span><strong>{{ totals.blocked }}</strong></div>
+</div>
+
+<div class="result-grid">
+  <section class="card">
+    <h2>Scans by risk level</h2>
+    <svg class="bar-chart" viewBox="0 0 400 {{ level_counts|length * 34 }}" role="img" aria-label="Scans by risk level">
+      {% for lv, n in level_counts %}
+      {% set y = loop.index0 * 34 %}
+      <text x="0" y="{{ y + 21 }}" class="bar-label">{{ lv }}</text>
+      <rect x="80" y="{{ y + 6 }}" width="{{ [((n / max_count) * 270)|round(1), 2]|max }}" height="20" rx="3" class="bar bar-{{ lv|lower|replace(' ', '-') }}"/>
+      <text x="{{ 80 + [((n / max_count) * 270)|round(1), 2]|max + 6 }}" y="{{ y + 21 }}" class="bar-value">{{ n }}</text>
+      {% endfor %}
+    </svg>
+  </section>
+
+  <section class="card">
+    <h2>ML service</h2>
+    {% if ml and ml.active %}
+      {% set active = (ml.versions|selectattr('version', 'equalto', ml.active)|list)[0] %}
+      <dl class="details">
+        <dt>Status</dt><dd><span class="badge badge-very-low">Online</span></dd>
+        <dt>Active model</dt><dd>{{ active.version }} · {{ active.algorithm }}</dd>
+        <dt>Accuracy</dt><dd>{{ active.metrics.accuracy|pct }}</dd>
+        <dt>F1 score</dt><dd>{{ active.metrics.f1 }}</dd>
+        <dt>Trained</dt><dd>{{ active.trained_at.replace('T', ' ') }}</dd>
+      </dl>
+    {% elif ml %}
+      <p><span class="badge badge-medium">No model</span> The service is running but no model is trained yet. Run <code>python ml_service/train_model.py --data ...</code></p>
+    {% else %}
+      <p><span class="badge badge-critical">Offline</span> The ML service is not reachable. Scans still work without the ML signal. Start it with <code>python ml_service/service.py</code>.</p>
+    {% endif %}
+    <a href="{{ url_for('admin.models') }}">View all model versions →</a>
+  </section>
+</div>
+
+<div class="result-grid">
+  <section class="card">
+    <h2>Most-seen risky domains</h2>
+    {% if top_domains %}
+    <table class="table">
+      <thead><tr><th>Domain</th><th>Scans</th><th>Max score</th></tr></thead>
+      <tbody>
+      {% for d in top_domains %}<tr><td class="url-cell">{{ d.domain }}</td><td>{{ d.n }}</td><td>{{ d.max_score }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted">No high-risk scans yet.</p>{% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Latest scans</h2>
+    <table class="table">
+      <tbody>
+      {% for r in recent %}
+      <tr>
+        <td class="url-cell"><a href="{{ url_for('scan.result', scan_id=r.id) }}">{{ r.normalized_url }}</a><div class="muted small">{{ r.email or 'guest' }}</div></td>
+        <td><span class="badge badge-{{ r.risk_level|lower|replace(' ', '-') }}">{{ r.risk_level }}</span></td>
+      </tr>
+      {% else %}<tr><td class="muted">No scans yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+<nav class="subnav">
+  <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">Dashboard</a>
+  <a href="{{ url_for('admin.reports') }}" class="{{ 'active' if request.endpoint == 'admin.reports' }}">Reports</a>
+  <a href="{{ url_for('admin.blocklist') }}" class="{{ 'active' if request.endpoint == 'admin.blocklist' }}">Blocklist</a>
+  <a href="{{ url_for('admin.models') }}" class="{{ 'active' if request.endpoint == 'admin.models' }}">ML models</a>
+  <a href="{{ url_for('admin.users') }}" class="{{ 'active' if request.endpoint == 'admin.users' }}">Users</a>
+  <a href="{{ url_for('admin.audit') }}" class="{{ 'active' if request.endpoint == 'admin.audit' }}">Audit log</a>
+</nav>

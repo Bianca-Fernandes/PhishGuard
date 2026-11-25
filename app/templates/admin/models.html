@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}ML models{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+{% include "admin/_nav.html" %}
+
+{% if not info %}
+<div class="flash flash-warning">The ML service is offline, so only versions already used in scans are shown.</div>
+{% endif %}
+
+{% if info and info.versions %}
+<div class="card">
+  <h2>Trained versions</h2>
+  <table class="table">
+    <thead><tr><th>Version</th><th>Algorithm</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>ROC-AUC</th><th>Rows</th><th>Dataset</th><th>Trained</th></tr></thead>
+    <tbody>
+    {% for m in info.versions|reverse %}
+    <tr>
+      <td><strong>{{ m.version }}</strong> {% if m.version == info.active %}<span class="badge badge-very-low">active</span>{% endif %}</td>
+      <td>{{ m.algorithm }}</td>
+      <td>{{ m.metrics.accuracy }}</td>
+      <td>{{ m.metrics.precision }}</td>
+      <td>{{ m.metrics.recall }}</td>
+      <td>{{ m.metrics.f1 }}</td>
+      <td>{{ m.metrics.roc_auc }}</td>
+      <td>{{ m.rows }}</td>
+      <td class="muted">{{ m.dataset }}</td>
+      <td class="muted nowrap">{{ m.trained_at.replace('T', ' ')[:16] }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% set active = (info.versions|selectattr('version', 'equalto', info.active)|list) %}
+{% if active %}{% set a = active[0] %}
+<div class="result-grid">
+  <div class="card">
+    <h2>Model comparison ({{ a.version }} training run)</h2>
+    <table class="table">
+      <thead><tr><th>Algorithm</th><th>Accuracy</th><th>F1</th><th>ROC-AUC</th><th>Train time</th></tr></thead>
+      <tbody>
+      {% for name, m in a.all_models.items() %}
+      <tr {% if name == a.algorithm %}class="row-highlight"{% endif %}><td>{{ name }}</td><td>{{ m.accuracy }}</td><td>{{ m.f1 }}</td><td>{{ m.roc_auc }}</td><td>{{ m.train_seconds }} s</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <h3>Confusion matrix (test set)</h3>
+    {% set cm = a.metrics.confusion_matrix %}
+    <table class="table cm">
+      <thead><tr><th></th><th>Predicted legitimate</th><th>Predicted phishing</th></tr></thead>
+      <tbody>
+        <tr><th>Actual legitimate</th><td>{{ cm.tn }}</td><td>{{ cm.fp }}</td></tr>
+        <tr><th>Actual phishing</th><td>{{ cm.fn }}</td><td>{{ cm.tp }}</td></tr>
+      </tbody>
+    </table>
+  </div>
+  {% if a.top_features %}
+  <div class="card">
+    <h2>Most important features</h2>
+    {% set top = a.top_features[0].importance %}
+    <svg class="bar-chart" viewBox="0 0 400 {{ a.top_features|length * 24 }}" role="img" aria-label="Feature importance">
+      {% for f in a.top_features %}
+      {% set y = loop.index0 * 24 %}
+      <text x="0" y="{{ y + 16 }}" class="bar-label small">{{ f.feature }}</text>
+      <rect x="160" y="{{ y + 5 }}" width="{{ ((f.importance / top) * 190)|round(1) }}" height="14" rx="2" class="bar bar-accent"/>
+      <text x="{{ 166 + ((f.importance / top) * 190)|round(1) }}" y="{{ y + 16 }}" class="bar-value small">{{ f.importance }}</text>
+      {% endfor %}
+    </svg>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+{% endif %}
+
+<div class="card">
+  <h2>Versions used in scans</h2>
+  {% if registered %}
+  <table class="table">
+    <thead><tr><th>Version</th><th>Algorithm</th><th>Accuracy</th><th>F1</th><th>Scans</th><th>First used</th></tr></thead>
+    <tbody>
+    {% for m in registered %}
+    <tr><td>{{ m.version }}</td><td>{{ m.algorithm }}</td><td>{{ m.accuracy if m.accuracy is not none else '-' }}</td><td>{{ m.f1_score if m.f1_score is not none else '-' }}</td><td>{{ m.scans_used }}</td><td class="muted">{{ m.registered_at.strftime('%d %b %Y') }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">No scans have used the model yet.</p>{% endif %}
+  <p class="muted small">To add a new version: put a new dataset in <code>ml_service/data/</code>, run <code>python ml_service/train_model.py --data ml_service/data/your_file.csv</code>, then restart the ML service.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Report phishing{% endblock %}
+{% block content %}
+<div class="narrow">
+  <h1>Report a phishing link</h1>
+  <p class="lead">Got a fake message? Send us the link. Our team checks every report, and confirmed links are added to the PhishGuard blocklist to protect other users.</p>
+
+  <form method="post" class="card form" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label>Suspicious link
+      <input type="text" name="url" value="{{ form.url }}" required maxlength="2048" placeholder="http://...">
+    </label>
+    <label>Where did you get it?
+      <select name="source_channel">
+        {% for val, label in channels %}<option value="{{ val }}" {{ 'selected' if val == form.source_channel }}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label>What did the message say? <span class="muted">(optional)</span>
+      <textarea name="description" rows="4" maxlength="1000" placeholder="e.g. SMS said my bank account will be blocked today and asked me to update KYC">{{ form.description }}</textarea>
+    </label>
+    <p class="muted small">Do not include your own passwords, OTPs or card numbers.</p>
+    <button class="btn" type="submit">Send report</button>
+  </form>
+
+  <div class="card info-box">
+    <strong>Lost money to a scam?</strong>
+    <p>In India, report it right away at <b>cybercrime.gov.in</b> or call the national helpline <b>1930</b>. Also call your bank to block your card or account.</p>
+  </div>
+</div>
+{% endblock %}
